@@ -21,21 +21,26 @@ class Golia
 
     trap("INT") { puts "<= Golia has ended his set (crowd applauds)"; kill }
 
-    begin
+    # begin
       parse!(link)
-    rescue
-      puts "<= Invalid url #{link}"
-      kill
-    end
+    # rescue
+    #   puts "<= Invalid url #{link}"
+    #   kill
+    # end
   end
 
   def parse!(url)
     begun_at = Time.now
     response = open(url)
     @ms << Time.now-begun_at
-    body  = response.read
-    links = body.scan(/<a.+?href=["'](.+?)["']/m).flatten
-    links.reject! { |link| link =~ /^\/$|^https?|^mailto|^javascript|#/ || File.extname(link) != "" }
+    return if File.extname(url) != ""
+    body   = response.read
+    links  = body.scan(/href=["'](.+?)["']/m).flatten
+    links += body.scan(/<script.+?src=["'](.+?)["']/m).flatten
+    links.reject! do |link|
+      link =~ /^\/$|^https?|^mailto|^javascript|#|"|'/ ||
+      File.extname(link) !~ /\.css|\.js|^$/
+    end
     links.map! { |link| link = "/"+link if link !~ /^\//; @host+link }
     @links.concat(links-@checked)
   end
