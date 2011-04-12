@@ -11,6 +11,8 @@ class Golia
       "http://" + URI.parse(link).host
     rescue
       puts "<= Invalid url #{link}"
+      kill
+      Process.kill(9, Process.pid)
     end
     @pid  = "#{Dir.tmpdir}/golia-#{@host.gsub(/^http:\/\//, '')}"
     @checked, @links, @invalid, @valid, @long, @ms = [], [], [], [], [], []
@@ -31,7 +33,7 @@ class Golia
     @ms << Time.now-begun_at
     body  = response.read
     links = body.scan(/<a.+?href=["'](.+?)["']/m).flatten
-    links.reject! { |link| link =~ /^\/$|^http|^mailto|^javascript|#/ || File.extname(link) != "" }
+    links.reject! { |link| link =~ /^\/$|^https?|^mailto|^javascript|#/ || File.extname(link) != "" }
     links.map! { |link| link = "/"+link if link !~ /^\//; @host+link }
     @links.concat(links-@checked)
   end
