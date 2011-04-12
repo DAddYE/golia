@@ -1,0 +1,39 @@
+= GOLIA
+
+Golia is an website performance analyzer. Check <b>speed</b> and <b>dead</b> links.
+
+== Usage
+
+ $ gem install golia
+ $ golia www.padrinorb.com
+
+You see an output like that:
+
+  Valid (1.01ms) http://padrinorb.com/guides/blog-tutorial
+  Valid (0.75ms) http://padrinorb.com/guides
+  Valid (0.86ms) http://padrinorb.com/pages/contribute
+  Valid (0.71ms) http://padrinorb.com/guides/padrino-admin
+  Valid (0.82ms) http://padrinorb.com/api
+  Valid (0.81ms) http://padrinorb.com/guides/generators
+  Valid (0.82ms) http://padrinorb.com/guides/controllers
+  Valid (0.70ms) http://padrinorb.com/guides/home
+  Valid (0.98ms) http://padrinorb.com/guides/basic-projects
+
+  ======== SUMMARY ========
+  Valid Links: 46
+  Invalid Links: 1
+    http://padrinorb.com/hhttps://github.com/apeacox/picciotto
+  Long requests: 4
+    http://padrinorb.com/guides/blog-tutorial
+    http://padrinorb.com/changes
+    http://padrinorb.com/guides/mounting-applications
+    http://padrinorb.com/blog
+  Average load time 0.80ms
+
+== Future
+
+In future we will add w3c validations.
+
+== Credits
+
+This software is created by DAddYE under MIT LICENSE.
