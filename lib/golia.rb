@@ -7,14 +7,11 @@ require 'tmpdir'
 class Golia
   def initialize(link)
     @host = begin
-      link = "http://#{link}" unless link =~ /^http/
-      "http://" + URI.parse(link).host
-    rescue
-      puts "<= Invalid url #{link}"
-      kill
-      Process.kill(9, Process.pid)
+      link = "http://#{link}" unless link =~ /^http(s?)/
+      "http#{$1}://" + URI.parse(link).host
     end
-    @pid  = "#{Dir.tmpdir}/golia-#{@host.gsub(/^http:\/\//, '')}"
+
+    @pid  = "#{Dir.tmpdir}/golia-#{@host.gsub(/^https?:\/\//, '')}"
     @checked, @links, @invalid, @valid, @long, @ms = [], [], [], [], [], []
 
     if File.exist?(@pid)
@@ -22,9 +19,14 @@ class Golia
       Process.kill(9, File.read(@pid).to_i) rescue nil
     end
 
-    trap("INT") { puts "<= Golia has ended his set (crowd applauds)"; kill; Process.kill(9, Process.pid) }
+    trap("INT") { puts "<= Golia has ended his set (crowd applauds)"; kill }
 
-    parse!(link)
+    begin
+      parse!(link)
+    rescue
+      puts "<= Invalid url #{link}"
+      kill
+    end
   end
 
   def parse!(url)
@@ -39,6 +41,7 @@ class Golia
   end
 
   def kill
+    Process.kill(9, Process.pid)
     FileUtils.rm_rf(@pid)
   end
 
