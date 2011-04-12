@@ -11,7 +11,7 @@ class Golia
       "http#{$1}://" + URI.parse(link).host
     end
 
-    @pid  = "#{Dir.tmpdir}/golia-#{@host.gsub(/^https?:\/\//, '')}"
+    @pid  = "#{Dir.tmpdir}/golia-#{URI.parse(link).host}"
     @checked, @links, @invalid, @valid, @long, @ms = [], [], [], [], [], []
 
     if File.exist?(@pid)
