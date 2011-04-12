@@ -5,9 +5,13 @@ require 'benchmark'
 require 'tmpdir'
 
 class Golia
-  def initialize(host)
-    @host = host
-    @host = "http://#{@host}" unless @host =~ /^http/
+  def initialize(link)
+    @host = begin
+      link = "http://#{link}" unless link =~ /^http/
+      "http://" + URI.parse(link).host
+    rescue
+      puts "<= Invalid url #{link}"
+    end
     @pid  = "#{Dir.tmpdir}/golia-#{@host.gsub(/^http:\/\//, '')}"
     @checked, @links, @invalid, @valid, @long, @ms = [], [], [], [], [], []
 
@@ -18,7 +22,7 @@ class Golia
 
     trap("INT") { puts "<= Golia has ended his set (crowd applauds)"; kill; Process.kill(9, Process.pid) }
 
-    parse!(@host)
+    parse!(link)
   end
 
   def parse!(url)
