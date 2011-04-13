@@ -9,26 +9,32 @@ Golia is an website performance analyzer. Check <b>speed</b> and <b>dead</b> lin
 
 You see an output like that:
 
-  Valid (1.01ms) http://padrinorb.com/guides/blog-tutorial
-  Valid (0.75ms) http://padrinorb.com/guides
-  Valid (0.86ms) http://padrinorb.com/pages/contribute
-  Valid (0.71ms) http://padrinorb.com/guides/padrino-admin
-  Valid (0.82ms) http://padrinorb.com/api
-  Valid (0.81ms) http://padrinorb.com/guides/generators
-  Valid (0.82ms) http://padrinorb.com/guides/controllers
-  Valid (0.70ms) http://padrinorb.com/guides/home
-  Valid (0.98ms) http://padrinorb.com/guides/basic-projects
+  $ golia padrinorb.com --w3c
+
+  OK - Ignore    - (0.66ms) http://padrinorb.com/stylesheets/padrino-bundle.css?1302660688
+  OK - Valid     - (0.71ms) http://padrinorb.com/blog
+  OK - Not Valid - (0.72ms) http://padrinorb.com/api
+  OK - Valid     - (0.65ms) http://padrinorb.com/pages/why
+  OK - Valid     - (0.58ms) http://padrinorb.com/team
+  OK - Ignore    - (0.88ms) http://padrinorb.com/javascripts/padrino-bundle.js?1302660688
+  OK - Not Valid - (0.77ms) http://padrinorb.com/guides
+  OK - Not Valid - (0.57ms) http://padrinorb.com/blog/padrino-slides
+  OK - Not Valid - (0.67ms) http://padrinorb.com/blog/looking-at-projects-using-padrino
+  OK - Not Valid - (0.65ms) http://padrinorb.com/blog/padrino-0-9-21-nested-forms-translations-and-more
+  OK - Not Valid - (0.57ms) http://padrinorb.com/blog/padrino-0-9-20-now-works-with-sinatra-1-2
 
   ======== SUMMARY ========
-  Valid Links: 46
-  Invalid Links: 1
-    http://padrinorb.com/hhttps://github.com/apeacox/picciotto
+  OK Links: 48
+  KO Links: 0
   Long requests: 4
-    http://padrinorb.com/guides/blog-tutorial
     http://padrinorb.com/changes
-    http://padrinorb.com/guides/mounting-applications
-    http://padrinorb.com/blog
-  Average load time 0.80ms
+    http://padrinorb.com/guides/application-helpers
+    http://padrinorb.com/guides/home
+    http://padrinorb.com/guides/adding-new-components
+  Invalid W3C Links: 37
+    http://validator.lipsiasoft.com/check?uri=http://padrinorb.com/api
+    http://validator.lipsiasoft.com/check?uri=http://padrinorb.com/guides
+  Average load time 0.73ms
 
 == Future
 

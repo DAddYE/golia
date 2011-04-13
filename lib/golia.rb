@@ -5,14 +5,15 @@ require 'benchmark'
 require 'tmpdir'
 
 class Golia
-  def initialize(link)
+  def initialize(link, validate)
+    @okate = validate
     @host = begin
       link = "http://#{link}" unless link =~ /^http(s?)/
       "http#{$1}://" + URI.parse(link).host
     end
 
     @pid  = "#{Dir.tmpdir}/golia-#{URI.parse(link).host}"
-    @checked, @links, @invalid, @valid, @long, @ms = [], [], [], [], [], []
+    @checked, @links, @ko, @ok, @long, @invalid, @ms = [], [], [], [], [], [], []
 
     if File.exist?(@pid)
       puts "<= Founded staled pid"
@@ -21,12 +22,12 @@ class Golia
 
     trap("INT") { puts "<= Golia has ended his set (crowd applauds)"; kill }
 
-    # begin
+    begin
       parse!(link)
-    # rescue
-    #   puts "<= Invalid url #{link}"
-    #   kill
-    # end
+    rescue
+      puts "<= Invalid url #{link}"
+      kill
+    end
   end
 
   def parse!(url)
@@ -45,6 +46,18 @@ class Golia
     @links.concat(links-@checked)
   end
 
+  def validate!(url)
+    return   "\e[33mIgnore   \e[0m" if !@okate || File.extname(url) != ""
+    body = open("http://validator.lipsiasoft.com/check?uri="+url).read
+    body =~ /<title>.+?(\[invalid\]|\[valid\])/mi
+    if $1 =~ /invalid/i
+      @invalid << url
+      return "\e[31mNot Valid\e[0m"
+    else
+      return "\e[32mValid    \e[0m"
+    end
+  end
+
   def kill
     Process.kill(9, Process.pid)
     FileUtils.rm_rf(@pid)
@@ -57,12 +70,12 @@ class Golia
         begin
           @checked << link
           parse!(link)
-          @valid << link
+          @ok << link
           @long  << link if @ms.last > 1
-          puts "\e[32mValid\e[0m (%0.2fms) %s" % [@ms.last, link]
+          puts "\e[32mOK\e[0m - #{validate!(link)} - (%0.2fms) %s" % [@ms.last, link]
         rescue Exception => e
-          @invalid << link
-          puts "\e[31mInvalid\e[0m %s - %s" % [link, e.message]
+          @ko << link
+          puts "\e[31mKO\e[0m %s - %s" % [link, e.message]
         ensure
           @links.delete(link)
         end
@@ -70,14 +83,18 @@ class Golia
     end
     puts
     puts "======== SUMMARY ========"
-    puts "Valid Links: %d" % @valid.size
-    puts "Invalid Links: %d" % @invalid.size
-    @invalid.each do |link|
+    puts "OK Links: %d" % @ok.size
+    puts "KO Links: %d" % @ko.size
+    @ko.each do |link|
       puts "  #{link}"
     end
     puts "Long requests: %d" % @long.size
     @long.each do |link|
       puts "  #{link}"
+    end
+    puts "Invalid W3C Links: %d" % @invalid.size
+    @invalid.each do |link|
+      puts "  http://validator.lipsiasoft.com/check?uri=#{link}"
     end
     puts "Average load time %0.2fms" % [@ms.inject(0) { |memo, ms| memo+=ms; memo }/@ms.size]
     puts

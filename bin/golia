@@ -3,7 +3,7 @@ require 'rubygems'
 require File.dirname(__FILE__) + '/../lib/golia'
 
 if ARGV[0]
-  golia = Golia.new(ARGV[0])
+  golia = Golia.new(ARGV[0], ARGV[1] == "--w3c")
   golia.start!
 else
   puts "<= You need to pass a domain ex: www.lipsiasoft.com"
