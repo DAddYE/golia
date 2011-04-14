@@ -32,13 +32,9 @@ You see an output like that:
     http://padrinorb.com/guides/home
     http://padrinorb.com/guides/adding-new-components
   Invalid W3C Links: 37
-    http://validator.lipsiasoft.com/check?uri=http://padrinorb.com/api
-    http://validator.lipsiasoft.com/check?uri=http://padrinorb.com/guides
+    http://validator.w3c.com/check?uri=http://padrinorb.com/api
+    http://validator.w3c.com/check?uri=http://padrinorb.com/guides
   Average load time 0.73ms
-
-== Future
-
-In future we will add w3c validations.
 
 == Credits
 
