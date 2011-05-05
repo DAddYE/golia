@@ -13,7 +13,7 @@ class Golia
     end
 
     @pid  = "#{Dir.tmpdir}/golia-#{URI.parse(link).host}"
-    @checked, @links, @ko, @ok, @long, @invalid, @ms = [], [], [], [], [], [], []
+    @checked, @links, @ko, @ok, @long, @invalid, @sec = [], [], [], [], [], [], []
 
     if File.exist?(@pid)
       puts "<= Founded staled pid"
@@ -33,7 +33,7 @@ class Golia
   def parse!(url)
     begun_at = Time.now
     response = open(url)
-    @ms << Time.now-begun_at
+    @sec << Time.now-begun_at
     return if File.extname(url) != ""
     body   = response.read
     links  = body.scan(/href=["'](.+?)["']/m).flatten
@@ -71,8 +71,8 @@ class Golia
           @checked << link
           parse!(link)
           @ok << link
-          @long  << link if @ms.last > 1
-          puts "\e[32mOK\e[0m - #{validate!(link)} - (%0.2fms) %s" % [@ms.last, link]
+          @long  << link if @sec.last > 1
+          puts "\e[32mOK\e[0m - #{validate!(link)} - (%0.2fsec) %s" % [@sec.last, link]
         rescue Exception => e
           @ko << link
           puts "\e[31mKO\e[0m %s - %s" % [link, e.message]
@@ -96,7 +96,7 @@ class Golia
     @invalid.each do |link|
       puts "  http://validator.lipsiasoft.com/check?uri=#{link}"
     end
-    puts "Average load time %0.2fms" % [@ms.inject(0) { |memo, ms| memo+=ms; memo }/@ms.size]
+    puts "Average load time %0.2fsec" % [@sec.inject(0) { |memo, sec| memo+=sec; memo }/@sec.size]
     puts
     kill
   end
