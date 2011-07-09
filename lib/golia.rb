@@ -16,7 +16,7 @@ class Golia
     @checked, @links, @ko, @ok, @long, @invalid, @sec = [], [], [], [], [], [], []
 
     if File.exist?(@pid)
-      puts "<= Founded staled pid"
+      puts "<= Founded stale pid"
       Process.kill(9, File.read(@pid).to_i) rescue nil
     end
 
@@ -34,16 +34,22 @@ class Golia
     begun_at = Time.now
     response = open(url)
     @sec << Time.now-begun_at
-    return if File.extname(url) != ""
-    body   = response.read
-    links  = body.scan(/href=["'](.+?)["']/m).flatten
-    links += body.scan(/<script.+?src=["'](.+?)["']/m).flatten
-    links.reject! do |link|
-      link =~ /^\/$|^https?|^mailto|^javascript|#|"|'/ ||
-      File.extname(link) !~ /\.css|\.js|^$/
+    case File.extname(url)
+      when ""
+        body   = response.read
+        links  = body.scan(/href=["'](.+?)["']/m).flatten
+        links += body.scan(/<script.+?src=["'](.+?)["']/m).flatten
+        links.reject! do |link|
+          link =~ /^\/$|^https?|^mailto|^javascript|#|"|'/ ||
+          File.extname(link) !~ /\.css|\.js|^$/
+        end
+        links.map! { |link| link = "/"+link if link !~ /^\//; @host+link }
+        @links.concat(links-@checked)
+      when /xml/i # maybe a sitemap
+        body   = response.read
+        links  = body.scan(/<loc>(http:\/\/.+)<\/loc>/).flatten
+        @links.concat(links-@checked)
     end
-    links.map! { |link| link = "/"+link if link !~ /^\//; @host+link }
-    @links.concat(links-@checked)
   end
 
   def validate!(url)
@@ -98,6 +104,5 @@ class Golia
     end
     puts "Average load time %0.2fsec" % [@sec.inject(0) { |memo, sec| memo+=sec; memo }/@sec.size]
     puts
-    kill
   end
 end

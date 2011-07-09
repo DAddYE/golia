@@ -1,3 +1,4 @@
+require 'rubygems' unless defined?(Gem)
 require 'rubygems/specification'
 require 'rake/gempackagetask'
 require 'rake'
@@ -23,7 +24,7 @@ desc "Release the gem"
 task :release => :package do
   sh "gem push pkg/#{gemspec.name}-#{gemspec.version}.gem"
   sh "rm -rf pkg"
-  sh "git add .; git commit -m \"Bump to version #{gemspec.version}\"; git push"
+  sh "git add .; git commit -m \"Bump to version #{gemspec.version}\"; git push origin master"
 end
 
 desc "Installs the gem locally"
